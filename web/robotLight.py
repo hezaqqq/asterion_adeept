@@ -536,43 +536,39 @@ class RobotLight(threading.Thread):
 if __name__ == '__main__':
     import time
     import os
+    import random
     print("spidev version is ", spidev.__version__)
     print("spidev device as show:")
     
-    led = Adeept_SPI_LedPixel(8, 255)              # Use MOSI for /dev/spidev0 to drive the lights
+    # Initialize 8 LEDs at max brightness (255)
+    led = Adeept_SPI_LedPixel(8, 255)              
+    
     try:
         if led.check_spi_state() != 0:
-            led.set_led_count(8)
-            led.set_all_led_color_data(255, 0, 0)
-            led.show()
-            time.sleep(0.5)
-            led.set_all_led_rgb_data([0, 255, 0])
-            led.show()
-            time.sleep(0.5)
-            led.set_all_led_color(0, 0, 255)
-            time.sleep(0.5)
-            led.set_all_led_rgb([0, 255, 255])
-            time.sleep(0.5)
-
-            led.set_led_count(12)
-            led.set_all_led_color_data(255, 255, 0)
-            for i in range(255):
-                led.set_led_brightness(i)
-                led.show()
-                time.sleep(0.005)
-            for i in range(255):
-                led.set_led_brightness(255-i)
-                led.show()
-                time.sleep(0.005)
-                  
-            led.set_led_brightness(20)
+            print("Starting high-intensity fast strobe loop... Press Ctrl+C to stop.")
+            
+            # Pure, high-contrast primary and secondary colors for maximum eye strain
+            intense_colors = [
+                (255, 0, 0),     # Red
+                (0, 255, 0),     # Green
+                (0, 0, 255),     # Blue
+                (255, 255, 0),   # Yellow
+                (255, 0, 255),   # Magenta
+                (0, 255, 255),   # Cyan
+                (255, 255, 255), # Pure White
+                (0, 0, 0)        # Black (Instant darkness contrast)
+            ]
+            
             while True:
-                for j in range(255):
-                    for i in range(led.led_count):
-                        led.set_led_rgb_data(i, led.wheel((round(i * 255 / led.led_count) + j)%256))
+                # Cycle through the intense color list rapidly
+                for color in intense_colors:
+                    led.set_all_led_color_data(color[0], color[1], color[2])
                     led.show()
-                    time.sleep(0.002)
+                    # 0.02 seconds (20ms) creates an incredibly fast ~50Hz flash rate
+                    time.sleep(0.02) 
+                    
         else:
             led.led_close()
     except KeyboardInterrupt:
+        print("\nStopping strobe.")
         led.led_close()
