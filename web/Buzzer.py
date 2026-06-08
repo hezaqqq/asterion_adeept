@@ -11,78 +11,66 @@ tb = TonalBuzzer(18)
 
 class Player(threading.Thread):
     def __init__(self, *args, **kwargs):
+        self.ERIKA = [
+            # "Auf der Hei-de blüht ein klei-nes Blü-me-lein"
+            ["Eb4", 0.25],
+            ["Ab4", 0.5], ["Ab4", 0.25], ["Bb4", 0.25],
+            ["C5",  0.5], ["C5",  0.25], ["Bb4", 0.25],
+            ["Ab4", 1.0],
+            ["rest", 0.5],
 
-        # --- Sheet music transcription ---
-        # Key: D major (F#, C#), Time: 4/4, Tempo: ~160 bpm (approx 0.375s per beat)
-        # Source: Piano right-hand melody (soprano saxophone rests throughout intro)
-        # Measures 1–12 visible in the score.
-        # The piano opens with a rapid ascending figure (marked 8va in m.1),
-        # then settles into a repeating rhythmic pattern.
-        # Note durations (in seconds) based on ~160 bpm:
-        #   quarter = 0.375, eighth = 0.1875, sixteenth = 0.09375, dotted-quarter = 0.5625
+            # "und das heißt... E-ri-ka"
+            ["Bb4", 0.25], ["Bb4", 0.25],
+            ["C5",  0.5],
+            ["Ab4", 0.25], ["F4",  0.25],
+            ["Eb4", 1.0],
+            ["rest", 0.5],
 
-        Q  = 0.375    # quarter note
-        E  = 0.1875   # eighth note
-        S  = 0.09375  # sixteenth note
-        DQ = 0.5625   # dotted quarter
+            # "Heiß von hunderttausend kleinen Bienelein"
+            ["Eb4", 0.25], ["Eb4", 0.25],
+            ["Bb4", 0.5], ["Bb4", 0.25], ["C5",  0.25],
+            ["Db5", 0.5], ["Db5", 0.25], ["C5",  0.25],
+            ["Bb4", 1.0],
+            ["rest", 0.5],
 
-        self.SONG_1 = [
-            # Measure 1 — fast ascending run (8va, rendered at written pitch)
-            # D4 E4 F#4 G4 A4 B4 C#5 D5 (sixteenth-note run) + dotted quarter D5
-            ["D4",  S], ["E4",  S], ["F#4", S], ["G4",  S],
-            ["A4",  S], ["B4",  S], ["C#5", S], ["D5",  S],
-            ["D5",  DQ], ["rest", E],
+            # "wird umschwärmt und auserkoren... E-ri-ka"
+            ["C5",  0.25], ["Bb4", 0.25],
+            ["C5",  0.5],
+            ["Ab4", 0.25], ["F4",  0.25],
+            ["Eb4", 1.0],
+            ["rest", 0.5],
 
-            # Measure 2 — melodic figure: A4 B4 A4 F#4 | D5 dotted
-            ["A4",  E], ["B4",  E], ["A4",  E], ["F#4", E],
-            ["D5",  DQ], ["rest", E],
+            # "In der Heimat wohnt ein kleines Mägdelein"
+            ["Eb4", 0.25],
+            ["Ab4", 0.5], ["Ab4", 0.25], ["Bb4", 0.25],
+            ["C5",  0.5], ["C5",  0.25], ["Bb4", 0.25],
+            ["Ab4", 1.0],
+            ["rest", 0.5],
 
-            # Measure 3 — repeat of measure 2 pattern
-            ["A4",  E], ["B4",  E], ["A4",  E], ["F#4", E],
-            ["D5",  DQ], ["rest", E],
+            # "und das heißt... E-ri-ka"
+            ["Bb4", 0.25], ["Bb4", 0.25],
+            ["C5",  0.5],
+            ["Ab4", 0.25], ["F4",  0.25],
+            ["Eb4", 1.0],
+            ["rest", 0.5],
 
-            # Measure 4 — similar figure, ending on E5
-            ["A4",  E], ["B4",  E], ["C#5", E], ["A4",  E],
-            ["E5",  DQ], ["rest", E],
+            # "Dieses Mägdlein ist mein treues Schätzelein"
+            ["Eb4", 0.25], ["Eb4", 0.25],
+            ["Bb4", 0.5], ["Bb4", 0.25], ["C5",  0.25],
+            ["Db5", 0.5], ["Db5", 0.25], ["C5",  0.25],
+            ["Bb4", 1.0],
+            ["rest", 0.5],
 
-            # Measure 5 — continues; figure on D5
-            ["F#4", E], ["A4",  E], ["D5",  E], ["A4",  E],
-            ["D5",  DQ], ["rest", E],
-
-            # Measure 6 — figure on C#5 / A4
-            ["E4",  E], ["A4",  E], ["C#5", E], ["A4",  E],
-            ["C#5", DQ], ["rest", E],
-
-            # Measure 7 — figure on B4
-            ["D4",  E], ["F#4", E], ["B4",  E], ["F#4", E],
-            ["B4",  DQ], ["rest", E],
-
-            # Measure 8 — figure resolving back to D5
-            ["A4",  E], ["B4",  E], ["A4",  E], ["F#4", E],
-            ["D5",  DQ], ["rest", E],
-
-            # Measures 9–12 — piano continues similar pattern (sax still resting)
-            # Measure 9
-            ["A4",  E], ["B4",  E], ["A4",  E], ["F#4", E],
-            ["D5",  DQ], ["rest", E],
-
-            # Measure 10
-            ["A4",  E], ["B4",  E], ["C#5", E], ["A4",  E],
-            ["E5",  DQ], ["rest", E],
-
-            # Measure 11
-            ["F#4", E], ["A4",  E], ["D5",  E], ["A4",  E],
-            ["D5",  DQ], ["rest", E],
-
-            # Measure 12 — final measure shown, cadential
-            ["E4",  E], ["A4",  E], ["C#5", E], ["A4",  E],
-            ["A4",  Q], ["rest", Q],
+            # "und mein Glück heißt... E-ri-ka"
+            ["C5",  0.25], ["Bb4", 0.25],
+            ["C5",  0.5],
+            ["Ab4", 0.25], ["F4",  0.25],
+            ["Eb4", 1.0],
         ]
 
         self.__flag = threading.Event()
         self.__flag.clear()
         self.MusicMode = 0
-
         super(Player, self).__init__(*args, **kwargs)
 
     def play(self, tune):
@@ -112,11 +100,10 @@ class Player(threading.Thread):
         while True:
             self.__flag.wait()
             try:
-                self.play(self.SONG_1)
+                self.play(self.ERIKA)
             except KeyboardInterrupt:
                 self.pause()
                 print("Program terminated by user.")
-
 
 if __name__ == "__main__":
     player = Player()
