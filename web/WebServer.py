@@ -11,6 +11,7 @@ import move
 import os
 import info
 import RPIservo
+import subprocess
 
 import functions
 import robotLight
@@ -150,6 +151,32 @@ def functionSelect(command_input, response):
     elif 'policeOff' == command_input:
         WS2812.breath(70,70,255)
         move.motorStop()
+
+    elif 'buzzer' == command_input:
+        try:
+            buzzer_script = os.path.join(thisPath, '../web/Buzzer.py')
+            subprocess.Popen(['python3', buzzer_script])
+        except Exception as e:
+            print(f"Error starting buzzer: {e}")
+
+    elif 'buzzerOff' == command_input:
+        try:
+            subprocess.run(['pkill', '-f', 'Buzzer.py'], check=False)
+        except Exception as e:
+            print(f"Error stopping buzzer: {e}")
+
+    elif 'bomb' == command_input:
+        try:
+            bomb_script = os.path.join(thisPath, '../taches/bomb.py')
+            subprocess.Popen(['python3', bomb_script])
+        except Exception as e:
+            print(f"Error starting bomb: {e}")
+
+    elif 'bombOff' == command_input:
+        try:
+            subprocess.run(['pkill', '-f', 'bomb.py'], check=False)
+        except Exception as e:
+            print(f"Error stopping bomb: {e}")
 
     elif 'speech' == command_input:
         speech.speech()
