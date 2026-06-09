@@ -1,9 +1,5 @@
-import time
-from robotLight import RobotWS2812 
-
 class LEDController:
     def __init__(self, led_count=14):
-        self.led_driver = RobotWS2812()
         self.led_count = led_count
         
         self.led_red_offset = 0
