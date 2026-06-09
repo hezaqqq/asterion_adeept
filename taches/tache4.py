@@ -64,29 +64,27 @@ def drive_ramp(target_throttle, ramp_time=1.0):
 
 # ── Etalonnage servo ─────────────────────────────────────────
 def calibrate_servo():
-    global SERVO_CENTER
     print("\n=== ETALONNAGE SERVO ===")
-    print("Balayage automatique...")
-    for duty, label in [(SERVO_LEFT, "gauche"), (SERVO_CENTER, "centre"), (SERVO_RIGHT, "droite")]:
-        _set_servo(duty)
-        print(f"  {label} (duty={duty})")
-        time.sleep(1.0)
+    print("Le servo est place au centre theorique (duty=4915).")
+    print("Observe le decalage des roues et note-le.")
+    print("Commandes : l=gauche | r=droite | ok=terminer\n")
     _set_servo(SERVO_CENTER)
 
-    center = SERVO_CENTER
-    print("\nAjuste le centre (roues droites) : l=gauche | r=droite | ok=valider")
+    offset = 0
+    step   = 50
     while True:
-        cmd = input(f"  duty={center} > ").strip().lower()
+        cmd = input(f"  decalage={offset:+d} > ").strip().lower()
         if cmd == 'ok':
-            SERVO_CENTER = center
-            print(f"Centre valide : {center}\n")
+            print(f"\nDecalage mesure : {offset:+d} (soit duty={SERVO_CENTER + offset})")
+            print("Note cette valeur pour corriger SERVO_CENTER si necessaire.\n")
+            _set_servo(SERVO_CENTER)   # remet au centre theorique avant de sortir
             break
         elif cmd == 'l':
-            center -= 50
-            _set_servo(center)
+            offset -= step
+            _set_servo(SERVO_CENTER + offset)
         elif cmd == 'r':
-            center += 50
-            _set_servo(center)
+            offset += step
+            _set_servo(SERVO_CENTER + offset)
 
 # ── Arret propre ─────────────────────────────────────────────
 def destroy():
@@ -137,4 +135,3 @@ if __name__ == '__main__':
         pass
     finally:
         destroy()
-        print("Au revoir.")
