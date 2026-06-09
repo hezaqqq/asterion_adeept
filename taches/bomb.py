@@ -3,13 +3,18 @@ import time
 import numpy
 import spidev
 from gpiozero import TonalBuzzer
-from gpiozero.tones import Tone
 from gpiozero import LED
 
 try:
-    tb = TonalBuzzer(18, min_tone=Tone("C4"), max_tone=Tone("C8"))
+    # Set explicit numeric frequency limits (Hz) instead of Tone objects
+    tb = TonalBuzzer(18, min_tone=200, max_tone=5000)
 except Exception:
-    tb = TonalBuzzer(18)
+    try:
+        # Fallback to default initialization if explicit bounds fail
+        tb = TonalBuzzer(18)
+    except Exception as e:
+        print(f"Buzzer initialization error: {e}")
+        tb = None
 
 LED_CONFIG = {
     1: {"gpio": 9,  "active_high": True},
@@ -66,13 +71,23 @@ def set_lights(state):
             led.off()
 
 def play_bomb_sequence():
+    if tb is None:
+        print("Buzzer not available. Running light sequence only.")
+    
     total_steps = 25
     start_freq = 1000
-    end_freq = 4000
+    end_freq = 3500
     start_delay = 0.6
     end_delay = 0.04
 
     try:
+        # Diagnostic startup beep
+        if tb:
+            tb.play(1500)
+            time.sleep(0.5)
+            tb.stop()
+            time.sleep(0.2)
+
         for step in range(total_steps):
             progress = step / float(total_steps - 1)
             current_freq = start_freq + (end_freq - start_freq) * progress
@@ -80,31 +95,36 @@ def play_bomb_sequence():
             pulse_duration = current_delay * 0.4
             
             set_lights(True)
-            try:
-                tb.play(current_freq)
-            except ValueError:
-                pass
+            if tb:
+                try:
+                    tb.play(current_freq)
+                except ValueError:
+                    tb.play(2000) # Fallback to mid frequency if out of range
             time.sleep(pulse_duration)
             
-            tb.stop()
+            if tb:
+                tb.stop()
             set_lights(False)
             time.sleep(current_delay - pulse_duration)
             
         set_lights(True)
-        for freq in range(1500, 260, -40):
-            try:
-                tb.play(freq)
-            except ValueError:
-                break
+        for freq in range(1500, 300, -50):
+            if tb:
+                try:
+                    tb.play(freq)
+                except ValueError:
+                    break
             time.sleep(0.01)
             
-        tb.stop()
+        if tb:
+            tb.stop()
         time.sleep(1)
         
     except KeyboardInterrupt:
         pass
     finally:
-        tb.stop()
+        if tb:
+            tb.stop()
         set_lights(False)
 
 if __name__ == "__main__":
