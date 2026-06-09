@@ -90,8 +90,9 @@ def destroy():
 
 # ── Programme principal : commande manuelle ──────────────────
 if __name__ == '__main__':
-    speed     = 25   # vitesse courante en %
-    ramp_time = 1.0  # pente courante en secondes
+    speed       = 25   # vitesse courante en %
+    ramp_time   = 1.0  # pente courante en secondes
+    current_dir = 0    # direction courante
 
     print("=== COMMANDE MANUELLE ===")
     print("  f/b  - avant/arriere   |  s  - stop")
@@ -105,17 +106,24 @@ if __name__ == '__main__':
             if cmd == 'q':
                 break
             elif cmd == 'f':
+                current_dir = 1
                 drive_ramp(1, speed, ramp_time)
             elif cmd == 'b':
+                current_dir = -1
                 drive_ramp(-1, speed, ramp_time)
             elif cmd == 's':
+                current_dir = 0
                 drive_ramp(0)
             elif cmd == '+':
                 speed = min(100, speed + 10)
                 print(f"  Vitesse -> {speed}%")
+                if current_dir != 0:
+                    drive_ramp(current_dir, speed, ramp_time)
             elif cmd == '-':
                 speed = max(5, speed - 10)
                 print(f"  Vitesse -> {speed}%")
+                if current_dir != 0:
+                    drive_ramp(current_dir, speed, ramp_time)
             elif cmd == 'r':
                 ramp_time = round(max(0.1, ramp_time + 0.5), 1) if ramp_time < 2.0 else 0.1
                 print(f"  Rampe -> {ramp_time}s")
@@ -127,3 +135,4 @@ if __name__ == '__main__':
         pass
     finally:
         destroy()
+        print("Au revoir.")
