@@ -40,22 +40,27 @@ def _set_servo(duty):
     pwm_motor.channels[SERVO_CHANNEL].duty_cycle = int(duty)
 
 # ── Fonction de pilotage avec rampe ─────────────────────────
-def drive_ramp(direction, target_speed=25, ramp_time=1.0):
-    # direction : 1=avant | -1=arriere | 0=stop
-    # target_speed : 0-100%
-    # ramp_time : duree montee en vitesse (secondes)
-    if direction == 0:
-        _set_all_motors(0)
-        print("[STOP]")
-        return
-    target_speed = max(0, min(100, target_speed))
+# throttle courant global (-1.0 a +1.0)
+current_throttle = 0.0
+
+def drive_ramp(target_throttle, ramp_time=1.0):
+    # target_throttle : valeur signee -1.0 (arriere) a +1.0 (avant), 0=stop
+    # ramp_time       : duree de la transition en secondes
+    global current_throttle
+    target_throttle = max(-1.0, min(1.0, target_throttle))
     steps = 100
     delay = ramp_time / steps
     for step in range(1, steps + 1):
-        throttle = _map(step, 0, steps, 0.0, target_speed / 100.0)
-        _set_all_motors(throttle if direction == 1 else -throttle)
+        t = _map(step, 0, steps, current_throttle, target_throttle)
+        _set_all_motors(t)
         time.sleep(delay)
-    print(f"[{'AVANT' if direction == 1 else 'ARRIERE'}] {target_speed}%  rampe={ramp_time}s")
+    current_throttle = target_throttle
+    if target_throttle > 0:
+        print(f"[AVANT]   {round(target_throttle * 100)}%")
+    elif target_throttle < 0:
+        print(f"[ARRIERE] {round(abs(target_throttle) * 100)}%")
+    else:
+        print("[STOP]")
 
 # ── Etalonnage servo ─────────────────────────────────────────
 def calibrate_servo():
@@ -90,15 +95,13 @@ def destroy():
 
 # ── Programme principal : commande manuelle ──────────────────
 if __name__ == '__main__':
-    speed       = 25   # vitesse courante en %
-    ramp_time   = 1.0  # pente courante en secondes
-    current_dir = 0    # direction courante
+    speed = 25  # vitesse de base en %
 
     print("=== COMMANDE MANUELLE ===")
     print("  f/b  - avant/arriere   |  s  - stop")
-    print("  +/-  - vitesse +-10%   |  r  - changer la pente")
-    print("  c    - etalonner servo  |  q  - quitter")
-    print(f"  Vitesse={speed}%  Rampe={ramp_time}s\n")
+    print("  +/-  - vitesse +-10%   |  c  - etalonner servo")
+    print("  q    - quitter")
+    print(f"  Vitesse de base = {speed}%  |  Rampe = 1s\n")
 
     try:
         while True:
@@ -106,27 +109,26 @@ if __name__ == '__main__':
             if cmd == 'q':
                 break
             elif cmd == 'f':
-                current_dir = 1
-                drive_ramp(1, speed, ramp_time)
+                drive_ramp(speed / 100.0)
             elif cmd == 'b':
-                current_dir = -1
-                drive_ramp(-1, speed, ramp_time)
+                drive_ramp(-speed / 100.0)
             elif cmd == 's':
-                current_dir = 0
-                drive_ramp(0)
+                drive_ramp(0.0)
             elif cmd == '+':
                 speed = min(100, speed + 10)
+                # reapplique la meme direction avec la nouvelle vitesse
+                if current_throttle > 0:
+                    drive_ramp(speed / 100.0)
+                elif current_throttle < 0:
+                    drive_ramp(-speed / 100.0)
                 print(f"  Vitesse -> {speed}%")
-                if current_dir != 0:
-                    drive_ramp(current_dir, speed, ramp_time)
             elif cmd == '-':
                 speed = max(5, speed - 10)
+                if current_throttle > 0:
+                    drive_ramp(speed / 100.0)
+                elif current_throttle < 0:
+                    drive_ramp(-speed / 100.0)
                 print(f"  Vitesse -> {speed}%")
-                if current_dir != 0:
-                    drive_ramp(current_dir, speed, ramp_time)
-            elif cmd == 'r':
-                ramp_time = round(max(0.1, ramp_time + 0.5), 1) if ramp_time < 2.0 else 0.1
-                print(f"  Rampe -> {ramp_time}s")
             elif cmd == 'c':
                 calibrate_servo()
             else:
