@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import time
 from gpiozero import LED
 
@@ -35,7 +32,7 @@ def switch(led_id, status):
     elif status == 0:
         leds[led_id].off()
     else:
-        print("Status inconnu.")
+        print("Status inconnu")
 
 def set_all_switch_off():
     for led_id in leds:
@@ -58,14 +55,14 @@ if __name__ == "__main__":
                 break
                 
             if len(commande) != 2 or not commande.isdigit():
-                print("Format invalide.")
+                print("Format invalide")
                 continue
                 
             action = int(commande[0])
             led_id = int(commande[1])
             
             if led_id == 0:
-                print("LED invalide.")
+                print("LED invalide")
                 continue
 
             if action == 1:
@@ -73,7 +70,7 @@ if __name__ == "__main__":
             elif action == 2:
                 switch(led_id, 0)
             else:
-                print("Action inconnue.")
+                print("Action inconnue")
                 
         except KeyboardInterrupt:
             set_all_switch_off()
