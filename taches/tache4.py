@@ -19,6 +19,13 @@ MOTOR_M4_IN2 =  9       #Define the negative pole of M4
 def map(x,in_min,in_max,out_min,out_max):
   return (x - in_min)/(in_max - in_min) *(out_max - out_min) +out_min
 
+#def setup():
+i2c = busio.I2C(SCL, SDA)
+# Create a simple PCA9685 class instance.
+#  pwm_motor.channels[7].duty_cycle = 0xFFFF
+pwm_motor = PCA9685(i2c, address=0x5f) #default 0x40
+pwm_motor.frequency = 50
+
 motor1 = motor.DCMotor(pwm_motor.channels[MOTOR_M1_IN1],pwm_motor.channels[MOTOR_M1_IN2] )
 motor1.decay_mode = (motor.SLOW_DECAY)
 motor2 = motor.DCMotor(pwm_motor.channels[MOTOR_M2_IN1],pwm_motor.channels[MOTOR_M2_IN2] )
@@ -28,12 +35,7 @@ motor3.decay_mode = (motor.SLOW_DECAY)
 motor4 = motor.DCMotor(pwm_motor.channels[MOTOR_M4_IN1],pwm_motor.channels[MOTOR_M4_IN2] )
 motor4.decay_mode = (motor.SLOW_DECAY)
 
-#def setup():
-i2c = busio.I2C(SCL, SDA)
-# Create a simple PCA9685 class instance.
-#  pwm_motor.channels[7].duty_cycle = 0xFFFF
-pwm_motor = PCA9685(i2c, address=0x5f) #default 0x40
-pwm_motor.frequency = 50
+
 
 def _set_all_motors(throttle_value):
     for m in (motor1, motor2, motor3, motor4):
