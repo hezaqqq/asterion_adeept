@@ -16,29 +16,32 @@ class ADS7830(object):
         return value
 
 if __name__ == "__main__":
-    adc = ADS7830()
-    controller = t3.ServoController()
-
-    current_angle = 90
-    controller.set_angle(0, current_angle)
-
-    STEP_SIZE = 5
-    MIN_ANGLE = 0
-    MAX_ANGLE = 180
-
     try:
-        while True:
-            adc_value = adc.analogRead(1)
-            print(f"Light Tracking Value: {adc_value} | Current Angle: {current_angle}")
+        adc = ADS7830()
+        controller = t3.ServoController()
 
-            if adc_value < 125:
-                current_angle -= STEP_SIZE
-            elif adc_value > 150:
-                current_angle += STEP_SIZE
+        current_angle = 90
+        controller.set_angle(0, current_angle)
 
-            current_angle = max(MIN_ANGLE, min(MAX_ANGLE, current_angle))
-            controller.set_angle(0, current_angle)
-            time.sleep(0.05) 
+        STEP_SIZE = 5
+        MIN_ANGLE = 0
+        MAX_ANGLE = 180
 
-    finally:
-        controller.deinit()
+        try:
+            while True:
+                adc_value = adc.analogRead(1)
+                print(f"Light Tracking Value: {adc_value} | Current Angle: {current_angle}")
+
+                if adc_value < 125:
+                    current_angle -= STEP_SIZE
+                elif adc_value > 150:
+                    current_angle += STEP_SIZE
+
+                current_angle = max(MIN_ANGLE, min(MAX_ANGLE, current_angle))
+                controller.set_angle(0, current_angle)
+                time.sleep(0.05) 
+
+        finally:
+            controller.deinit()
+    except KeyboardInterrupt:
+        pass
