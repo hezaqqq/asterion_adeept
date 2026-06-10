@@ -50,7 +50,7 @@ def _set_servo(self, duty):
 current_throttle = 0.0
 
 def drive_ramp(self, target_throttle, ramp_time=1.0):
-    # target_throttle : valeur signee -1.0 (arriere) a +1.0 (avant), 0=stop
+    # target_throttle : valeur signee -1.0 (reculer) a +1.0 (avancer), 0=stop
     # ramp_time       : duree de la transition en secondes
     global current_throttle
     target_throttle = max(-1.0, min(1.0, target_throttle))
@@ -62,9 +62,9 @@ def drive_ramp(self, target_throttle, ramp_time=1.0):
         time.sleep(delay)
     current_throttle = target_throttle
     if target_throttle > 0:
-        print(f"[AVANT]   {round(target_throttle * 100)}%")
+        print(f"[AVANCER]   {round(target_throttle * 100)}%")
     elif target_throttle < 0:
-        print(f"[ARRIERE] {round(abs(target_throttle) * 100)}%")
+        print(f"[RECULER] {round(abs(target_throttle) * 100)}%")
     else:
         print("[STOP]")
 
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     speed = 25  # vitesse de base en %
 
     print("=== COMMANDE MANUELLE ===")
-    print("  f/b  - avant/arriere   |  s  - stop")
+    print("  f/b  - avancer/reculer   |  s  - stop")
     print("  +/-  - vitesse +-10%   |  c  - etalonner servo")
     print("  q    - quitter")
     print(f"  Vitesse de base = {speed}%  |  Rampe = 1s\n")
@@ -118,7 +118,6 @@ if __name__ == '__main__':
                 drive_ramp(0.0)
             elif cmd == '+':
                 speed = min(100, speed + 10)
-                # reapplique la meme direction avec la nouvelle vitesse
                 if current_throttle > 0:
                     drive_ramp(speed / 100.0)
                 elif current_throttle < 0:
