@@ -32,11 +32,7 @@ class ServoController:
     def set_angle(self, servo_id: int, angle: float) -> None:
         min_safe, max_safe = self.SAFE_ANGLES.get(servo_id, (0, 180))
         safe_angle = max(min_safe, min(max_safe, angle))
-
-        if safe_angle != angle:
-            print(f"CH{servo_id}: {angle}° limite à {safe_angle}° "
-                  f"(plage sure : {min_safe}°–{max_safe}°)")
-
+        
         s = servo.Servo(
             self.pca.channels[servo_id],
             min_pulse=self.MIN_PULSE,
