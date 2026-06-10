@@ -1,15 +1,20 @@
 from gpiozero import DistanceSensor
 from time import sleep
 
-Tr = 23
-Ec = 24
-sensor = DistanceSensor(echo=Ec, trigger=Tr,max_distance=2) # Maximum detection distance 2m.
+class Distance:
 
-# Get the distance of ultrasonic detection.
-def checkdist():
-    return (sensor.distance) *1000 # Unit: mm
+    def __init__(self):
+        self.Tr = 23
+        self.Ec = 24
+        self.sensor = DistanceSensor(echo=self.Ec, trigger=self.Tr, max_distance=2)  # Maximum detection distance 2m.
+
+    # Get the distance of ultrasonic detection.
+    def checkdist(self):
+        return (self.sensor.distance) * 1000  # Unit: mm
 
 if __name__ == "__main__":
-    distance = checkdist() 
-    print("%.2f mm" %distance)
-    sleep(0.05)
+    distance_sensor = Distance()
+    while True:
+        distance = distance_sensor.checkdist()
+        print("%.2f mm" % distance)
+        sleep(0.05)
