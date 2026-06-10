@@ -15,7 +15,7 @@ line_follower = None  # Don't initialize - will be created fresh for each task 6
 
 
 if __name__ == "__main__":
-    action = input("Entrez les numéros de tâche à exécuter séparés d'un espace : ").strip().split()
+    action = input("Entrez les numeros de tache a executer separes d'un espace : ").strip().split()
     for i in range(len(action)):
         try:
             if action[i] == '1':
