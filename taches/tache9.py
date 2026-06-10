@@ -7,116 +7,116 @@ import tache2 as t2
 import tache4 as t4
 import tache5 as t5
 
-# ── Constantes ───────────────────────────────────────────────
-VITESSE_MARCHE   = 0.25   # throttle de marche avant (35%)
-DIST_OBSTACLE_MM = 300.0    # seuil d'arret en mm (20 cm)
-PERIODE_CAPTEUR  = 0.05   # lecture distance toutes les 50 ms
+class RobotController:
 
-# ── Initialisation des modules ───────────────────────────────
-leds_gpio = t1.RobotLEDController()
-leds_gpio.switchSetup()
-leds_gpio.set_all_switch_off()
+    VITESSE_MARCHE   = 0.25
+    DIST_OBSTACLE_MM = 300.0
+    PERIODE_CAPTEUR  = 0.05
 
-leds_ws   = t2.LEDController(led_count=14)
-leds_ws.turn_off_all()
+    def __init__(self):
+        self.leds_gpio = t1.RobotLEDController()
+        self.leds_gpio.switchSetup()
+        self.leds_gpio.set_all_switch_off()
 
-mc        = t4.MotorController()
-capteur   = t5.Distance()
+        self.leds_ws = t2.LEDController(led_count=14)
+        self.leds_ws.turn_off_all()
 
-# ── Etat global ──────────────────────────────────────────────
-en_marche   = False
-feux_actifs = False
-stop_feux   = threading.Event()
+        self.mc      = t4.MotorController()
+        self.capteur = t5.Distance()
 
-# ── Feux de detresse ─────────────────────────────────────────
-def _clignoter_feux():
-    while not stop_feux.is_set():
-        for i in range(1, 10):
-            leds_gpio.switch(i, 1)
-        for i in range(14):
-            leds_ws.set_led(i, 255, 80, 0)  # orange
-        time.sleep(0.4)
-        leds_gpio.set_all_switch_off()
-        leds_ws.turn_off_all()
-        time.sleep(0.4)
+        self.en_marche   = False
+        self.feux_actifs = False
+        self.stop_feux   = threading.Event()
 
-def activer_feux():
-    global feux_actifs
-    if feux_actifs:
-        return
-    feux_actifs = True
-    stop_feux.clear()
-    threading.Thread(target=_clignoter_feux, daemon=True).start()
-    print("[FEUX] Feux de detresse ON")
+    # ── Feux ──────────────────────────────────────────────────
 
-def desactiver_feux():
-    global feux_actifs
-    if not feux_actifs:
-        return
-    stop_feux.set()
-    feux_actifs = False
-    leds_gpio.set_all_switch_off()
-    leds_ws.turn_off_all()
-    print("[FEUX] Feux de detresse OFF")
+    def _clignoter_feux(self):
+        while not self.stop_feux.is_set():
+            for i in range(1, 10):
+                self.leds_gpio.switch(i, 1)
+            for i in range(14):
+                self.leds_ws.set_led(i, 255, 80, 0)
+            time.sleep(0.4)
+            self.leds_gpio.set_all_switch_off()
+            self.leds_ws.turn_off_all()
+            time.sleep(0.4)
 
-# ── Moteur ───────────────────────────────────────────────────
-def demarrer():
-    global en_marche
-    if en_marche:
-        return
-    en_marche = True
-    desactiver_feux()
-    mc.drive_ramp(VITESSE_MARCHE, ramp_time=1.0)
-    print("[MOTEUR] Marche avant")
+    def activer_feux(self):
+        if self.feux_actifs:
+            return
+        self.feux_actifs = True
+        self.stop_feux.clear()
+        threading.Thread(target=self._clignoter_feux, daemon=True).start()
+        print("[FEUX] Feux de detresse ON")
 
-def arreter():
-    global en_marche
-    en_marche = False
-    mc.drive_ramp(0.0, ramp_time=0.00001)
-    print("[MOTEUR] Arret")
+    def desactiver_feux(self):
+        if not self.feux_actifs:
+            return
+        self.stop_feux.set()
+        self.feux_actifs = False
+        self.leds_gpio.set_all_switch_off()
+        self.leds_ws.turn_off_all()
+        print("[FEUX] Feux de detresse OFF")
 
-# ── Thread surveillance capteur ──────────────────────────────
-def _surveiller_distance():
-    while True:
-        if en_marche:
-            dist = capteur.checkdist()
-            if dist < DIST_OBSTACLE_MM:
-                print(f"[CAPTEUR] Obstacle a {dist:.0f} mm — arret !")
-                arreter()
-                activer_feux()
-        time.sleep(PERIODE_CAPTEUR)
+    # ── Moteur ────────────────────────────────────────────────
 
-# ── Programme principal ──────────────────────────────────────
-def run():
-    print("=== TACHE 9 : Marche avant avec arret sur obstacle ===")
-    print("  M  - demarrer la marche avant")
-    print("  A  - arret manuel")
-    print("  q  - quitter\n")
+    def demarrer(self):
+        if self.en_marche:
+            return
+        self.en_marche = True
+        self.desactiver_feux()
+        self.mc.drive_ramp(self.VITESSE_MARCHE, ramp_time=1.0)
+        print("[MOTEUR] Marche avant")
 
-    threading.Thread(target=_surveiller_distance, daemon=True).start()
+    def arreter(self):
+        self.en_marche = False
+        self.mc.drive_ramp(0.0, ramp_time=0.00001)
+        print("[MOTEUR] Arret")
 
-    try:
+    # ── Capteur ───────────────────────────────────────────────
+
+    def _surveiller_distance(self):
         while True:
-            cmd = input("Commande > ").strip()
-            if cmd == 'M':
-                demarrer()
-            elif cmd in ('A', 'a'):
-                arreter()
-                desactiver_feux()
-            elif cmd == 'q':
-                break
-            else:
-                print("  Commandes : M | A | q")
+            if self.en_marche:
+                dist = self.capteur.checkdist()
+                if dist < self.DIST_OBSTACLE_MM:
+                    print(f"[CAPTEUR] Obstacle a {dist:.0f} mm — arret !")
+                    self.arreter()
+                    self.activer_feux()
+            time.sleep(self.PERIODE_CAPTEUR)
 
-    except KeyboardInterrupt:
-        print("\nFin de programme par Ctrl-C")
+    # ── Run ───────────────────────────────────────────────────
 
-    finally:
-        arreter()
-        desactiver_feux()
-        mc.destroy()
-        print("Nettoyage final realise")
+    def run(self):
+        print("=== TACHE 9 : Marche avant avec arret sur obstacle ===")
+        print("  M  - demarrer la marche avant")
+        print("  A  - arret manuel")
+        print("  q  - quitter\n")
+
+        threading.Thread(target=self._surveiller_distance, daemon=True).start()
+
+        try:
+            while True:
+                cmd = input("Commande > ").strip()
+                if cmd == 'M':
+                    self.demarrer()
+                elif cmd in ('A', 'a'):
+                    self.arreter()
+                    self.desactiver_feux()
+                elif cmd == 'q':
+                    break
+                else:
+                    print("  Commandes : M | A | q")
+
+        except KeyboardInterrupt:
+            print("\nFin de programme par Ctrl-C")
+
+        finally:
+            self.arreter()
+            self.desactiver_feux()
+            self.mc.destroy()
+            print("Nettoyage final realise")
+
 
 if __name__ == "__main__":
-    run()
-
+    RobotController().run()

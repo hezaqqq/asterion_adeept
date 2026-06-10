@@ -18,32 +18,43 @@ class ADS7830(object):
 
 if __name__ == "__main__":
     try:
-        # t9 tourne 
-        threading.Thread(target=t9.run, daemon=True).start()
-        time.sleep(1) 
+        robot = t9.RobotController()
+        threading.Thread(target=robot.run, daemon=True).start()
+        time.sleep(1)
 
         adc = ADS7830()
         controller = t3.ServoController()
 
         baseline = sum(adc.analogRead(1) for _ in range(20)) / 20
 
-        current_angle = 90
+        current_angle = 100
         controller.set_angle(0, current_angle)
+
+        was_en_marche = robot.en_marche
 
         try:
             while True:
                 ecart = adc.analogRead(1) - baseline
 
                 if ecart < -5:
-                    current_angle = max(120, current_angle - 5)
+                    current_angle = max(130, current_angle - 5)
                 elif ecart > 5:
                     current_angle = min(60, current_angle + 5)
 
                 controller.set_angle(0, current_angle)
+
+                # Détecte l'arrêt sur obstacle
+                if was_en_marche and not robot.en_marche:
+                    print("Obstacle détecté, recul de 30cm")
+                    robot.mc.drive_ramp(-t9.RobotController.VITESSE_MARCHE, ramp_time=0.5)
+                    time.sleep(1.5) 
+                    robot.mc.drive_ramp(0.0, ramp_time=0.1)
+
+                was_en_marche = robot.en_marche
                 time.sleep(0.05)
 
         finally:
-            controller.set_angle(0, 90)
+            controller.set_angle(0, 100)
             controller.deinit()
 
     except KeyboardInterrupt:
