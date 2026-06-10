@@ -6,21 +6,27 @@ from adafruit_pca9685 import PCA9685
 from adafruit_motor import motor
 
 # ── Initialisation ──────────────────────────────────────────
-i2c = busio.I2C(SCL, SDA)
-pwm_motor = PCA9685(i2c, address=0x5f)
-pwm_motor.frequency = 1000  # 1 kHz pour moteurs DC
+class MotorController:
+    def __init__(self):
+        self.i2c = busio.I2C(SCL, SDA)
+        self.pwm_motor = PCA9685(self.i2c, address=0x5f)
+        self.pwm_motor.frequency = 1000  # 1 kHz pour moteurs DC
 
-MOTOR_M1_IN1, MOTOR_M1_IN2 = 15, 14
-MOTOR_M2_IN1, MOTOR_M2_IN2 = 12, 13
-MOTOR_M3_IN1, MOTOR_M3_IN2 = 11, 10
-MOTOR_M4_IN1, MOTOR_M4_IN2 =  8,  9
+        # Configuration des canaux pour les moteurs
+        self.MOTOR_M1_IN1, self.MOTOR_M1_IN2 = 15, 14
+        self.MOTOR_M2_IN1, self.MOTOR_M2_IN2 = 12, 13
+        self.MOTOR_M3_IN1, self.MOTOR_M3_IN2 = 11, 10
+        self.MOTOR_M4_IN1, self.MOTOR_M4_IN2 = 8, 9
 
-motor1 = motor.DCMotor(pwm_motor.channels[MOTOR_M1_IN1], pwm_motor.channels[MOTOR_M1_IN2])
-motor2 = motor.DCMotor(pwm_motor.channels[MOTOR_M2_IN1], pwm_motor.channels[MOTOR_M2_IN2])
-motor3 = motor.DCMotor(pwm_motor.channels[MOTOR_M3_IN1], pwm_motor.channels[MOTOR_M3_IN2])
-motor4 = motor.DCMotor(pwm_motor.channels[MOTOR_M4_IN1], pwm_motor.channels[MOTOR_M4_IN2])
-for m in (motor1, motor2, motor3, motor4):
-    m.decay_mode = motor.SLOW_DECAY
+        # Création des objets moteur
+        self.motor1 = motor.DCMotor(self.pwm_motor.channels[self.MOTOR_M1_IN1], self.pwm_motor.channels[self.MOTOR_M1_IN2])
+        self.motor2 = motor.DCMotor(self.pwm_motor.channels[self.MOTOR_M2_IN1], self.pwm_motor.channels[self.MOTOR_M2_IN2])
+        self.motor3 = motor.DCMotor(self.pwm_motor.channels[self.MOTOR_M3_IN1], self.pwm_motor.channels[self.MOTOR_M3_IN2])
+        self.motor4 = motor.DCMotor(self.pwm_motor.channels[self.MOTOR_M4_IN1], self.pwm_motor.channels[self.MOTOR_M4_IN2])
+        
+        for m in (self.motor1, self.motor2, self.motor3, self.motor4):
+            m.decay_mode = motor.SLOW_DECAY
+
 
 # Servo de direction sur le même PCA9685, canal 0
 SERVO_CHANNEL = 0
@@ -29,21 +35,21 @@ SERVO_CENTER  = 4915
 SERVO_RIGHT   = 6554
 
 # ── Fonctions internes ───────────────────────────────────────
-def _map(x, in_min, in_max, out_min, out_max):
+def _map(self, x, in_min, in_max, out_min, out_max):
     return (x - in_min) / (in_max - in_min) * (out_max - out_min) + out_min
 
-def _set_all_motors(throttle_value):
-    for m in (motor1, motor2, motor3, motor4):
+def _set_all_motors(self, throttle_value):
+    for m in (self.motor1, self.motor2, self.motor3, self.motor4):
         m.throttle = throttle_value
 
-def _set_servo(duty):
-    pwm_motor.channels[SERVO_CHANNEL].duty_cycle = int(duty)
+def _set_servo(self, duty):
+    self.pwm_motor.channels[SERVO_CHANNEL].duty_cycle = int(duty)
 
 # ── Fonction de pilotage avec rampe ─────────────────────────
 # throttle courant global (-1.0 a +1.0)
 current_throttle = 0.0
 
-def drive_ramp(target_throttle, ramp_time=1.0):
+def drive_ramp(self, target_throttle, ramp_time=1.0):
     # target_throttle : valeur signee -1.0 (arriere) a +1.0 (avant), 0=stop
     # ramp_time       : duree de la transition en secondes
     global current_throttle
@@ -51,8 +57,8 @@ def drive_ramp(target_throttle, ramp_time=1.0):
     steps = 100
     delay = ramp_time / steps
     for step in range(1, steps + 1):
-        t = _map(step, 0, steps, current_throttle, target_throttle)
-        _set_all_motors(t)
+        t = self._map(step, 0, steps, current_throttle, target_throttle)
+        self._set_all_motors(t)
         time.sleep(delay)
     current_throttle = target_throttle
     if target_throttle > 0:
@@ -63,11 +69,11 @@ def drive_ramp(target_throttle, ramp_time=1.0):
         print("[STOP]")
 
 # ── Etalonnage servo ─────────────────────────────────────────
-def calibrate_servo():
+def calibrate_servo(self):
     print("\n=== ETALONNAGE SERVO ===")
     print("Le servo est place au centre theorique (duty=4915).")
     print("Commandes : l=gauche | r=droite | ok=terminer\n")
-    _set_servo(SERVO_CENTER)
+    self._set_servo(SERVO_CENTER)
 
     offset = 0
     step   = 50
@@ -75,19 +81,19 @@ def calibrate_servo():
         cmd = input(f"  decalage={offset:+d} > ").strip().lower()
         if cmd == 'ok':
             print(f"\nDecalage mesure : {offset:+d} (soit duty={SERVO_CENTER + offset})")
-            _set_servo(SERVO_CENTER)   # remet au centre theorique avant de sortir
+            self._set_servo(SERVO_CENTER)   # remet au centre theorique avant de sortir
             break
         elif cmd == 'l':
             offset -= step
-            _set_servo(SERVO_CENTER + offset)
+            self._set_servo(SERVO_CENTER + offset)
         elif cmd == 'r':
             offset += step
-            _set_servo(SERVO_CENTER + offset)
+            self._set_servo(SERVO_CENTER + offset)
 
 # ── Arret propre ─────────────────────────────────────────────
-def destroy():
-    _set_all_motors(0)
-    pwm_motor.deinit()
+def destroy(self):
+    self._set_all_motors(0)
+    self.pwm_motor.deinit()
 
 # ── Programme principal : commande manuelle ──────────────────
 if __name__ == '__main__':
