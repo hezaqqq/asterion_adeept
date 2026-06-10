@@ -1,22 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tâche 3 – Contrôle des servomoteurs 180° – Robot Adeept PiCar-B
-
-Matériel :
-  - Raspberry Pi + Adeept Robot HAT V3.1 (PCA9685 @ I2C 0x5f)
-  - CH0, CH1, CH2 : servos mécaniques du robot  ← à utiliser avec précaution
-  - CH7           : servo libre (test sans mécanique) ← démarrer ici
-
-Précaution importante :
-  Ces servomoteurs ne supportent PAS d'être bloqués en rotation.
-  Une butée mécanique provoque une surchauffe rapide et peut les détruire.
-  → Toujours rester dans la plage de mouvement réelle du mécanisme.
-  → Angles sûrs recommandés pour CH0-CH2 : 60° à 120° (centré sur 90°).
-  → CH7 (libre) : 0° à 180° autorisés.
-
-Installation des dépendances :
-  sudo pip3 install adafruit-circuitpython-motor adafruit-circuitpython-pca9685 --break-system-packages
-"""
+# sudo pip3 install adafruit-circuitpython-motor adafruit-circuitpython-pca9685 --break-system-packages
 
 import time
 from board import SCL, SDA
@@ -27,16 +10,6 @@ from adafruit_pca9685 import PCA9685
 # Classe 1 : ServoController
 # Gère le PCA9685 et le pilotage de tous les servomoteurs
 class ServoController:
-    """
-    Contrôleur central des servomoteurs via le PCA9685.
-
-    Attributs
-    ---------
-    SAFE_ANGLES : dict – plages d'angles sûres par canal (min°, max°)
-    MIN_PULSE   : int  – impulsion minimale en µs (position 0°)
-    MAX_PULSE   : int  – impulsion maximale en µs (position 180°)
-    """
-
     # Plages d'angles sûres par canal
     SAFE_ANGLES = {
         0: (60, 120),   # CH0 – servo mécanique → ±30° autour du centre (90°)
@@ -45,8 +18,8 @@ class ServoController:
         7: (0,  180),   # CH7 – servo libre, pleine plage autorisée
     }
 
-    MIN_PULSE = 500    # µs – impulsion minimale (0°)
-    MAX_PULSE = 2400   # µs – impulsion maximale (180°)
+    MIN_PULSE = 500   
+    MAX_PULSE = 2400  
 
     def __init__(self):
         """Initialise le bus I2C et le contrôleur PCA9685."""
@@ -56,17 +29,6 @@ class ServoController:
         print("  ✓ PCA9685 initialisé (I2C 0x5f, 50 Hz)")
 
     def set_angle(self, servo_id: int, angle: float) -> None:
-        """
-        Pilote le servomoteur <servo_id> à l'angle <angle> (0° à 180°).
-
-        Paramètres
-        ----------
-        servo_id : int   – Numéro du canal PCA9685 (0–15)
-        angle    : float – Angle cible en degrés (0 à 180)
-
-        Sécurité : l'angle est automatiquement limité à la plage SAFE_ANGLES
-        du canal pour éviter toute mise en butée mécanique.
-        """
         min_safe, max_safe = self.SAFE_ANGLES.get(servo_id, (0, 180))
         safe_angle = max(min_safe, min(max_safe, angle))
 
@@ -96,13 +58,6 @@ class ServoController:
 # Classe 2 : ServoTester
 # Test automatique du servo libre CH7
 class ServoTester:
-    """
-    Effectue un test automatique de validation sur le servo libre CH7.
-
-    Séquence : centre (90°) → gauche (45°) → droite (135°) → retour centre (90°).
-    But : confirmer que le câblage I2C fonctionne et que set_angle() répond
-    correctement, sans risque de blocage mécanique.
-    """
     SEQUENCE = [
         (90,  "centre"),
         (45,  "gauche"),
@@ -111,10 +66,7 @@ class ServoTester:
     ]
 
     def __init__(self, controller: ServoController):
-        """
-        Paramètres
-        controller : ServoController – instance partagée du contrôleur
-        """
+        #controller : ServoController – instance partagée du contrôleur
         self.ctrl = controller
 
     def run(self) -> None:
@@ -133,27 +85,9 @@ class ServoTester:
 # Classe 3 : ServoManual
 # Commande manuelle interactive des servomoteurs
 class ServoManual:
-    """
-    Interface en ligne de commande pour piloter manuellement
-    les servomoteurs CH0, CH1, CH2 et CH7.
-
-    Saisie : <canal> <angle>
-    Exemples :
-        0 90    → CH0 à 90° (centre)
-        0 60    → CH0 limite gauche
-        0 120   → CH0 limite droite
-        7 45    → CH7 à 45°
-        7 180   → CH7 pleine droite
-        q       → quitter
-    """
-
     CHANNELS = [0, 1, 2, 7]
 
     def __init__(self, controller: ServoController):
-        """
-        Paramètres
-        controller : ServoController – instance partagée du contrôleur
-        """
         self.ctrl = controller
 
     def _afficher_aide(self) -> None:
@@ -208,11 +142,8 @@ class ServoManual:
                 self.ctrl.center_all()
                 break
 
-# Point d'entrée
 if __name__ == "__main__":
     print("=== Contrôle Servomoteurs – Robot Adeept ===\n")
-
-    # Instanciation du contrôleur (partagé entre les deux étapes)
     controller = ServoController()
 
     # Étape 1 : test automatique servo libre CH7
@@ -225,5 +156,4 @@ if __name__ == "__main__":
     manual = ServoManual(controller)
     manual.run()
 
-    # Libération propre du matériel
     controller.deinit()
