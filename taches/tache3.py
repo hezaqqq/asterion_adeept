@@ -47,7 +47,7 @@ class ServoController:
     def center_all(self) -> None:
         """Remet tous les servos configures à 90° (position centrale)."""
         for ch in self.SAFE_ANGLES:
-            self.set_angle(ch, 95)
+            self.set_angle(ch, 100)
             time.sleep(0.1)
 
     def deinit(self) -> None:
