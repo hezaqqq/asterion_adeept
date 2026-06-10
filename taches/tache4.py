@@ -134,3 +134,4 @@ if __name__ == '__main__':
         pass
     finally:
         mc.destroy()
+        print("Au revoir.")
