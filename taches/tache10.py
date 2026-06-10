@@ -20,7 +20,6 @@ if __name__ == "__main__":
         controller = t3.ServoController()
 
         baseline = sum(adc.analogRead(1) for _ in range(20)) / 20
-        print(f"Base : {baseline:.1f}")
 
         current_angle = 90
         controller.set_angle(0, current_angle)
@@ -30,10 +29,10 @@ if __name__ == "__main__":
                 ecart = adc.analogRead(1) - baseline
                 print(f"Écart: {ecart:+.1f} | Angle: {current_angle}°")
 
-                if ecart < -10:
-                    current_angle = max(60, current_angle - 5)
-                elif ecart > 10:
-                    current_angle = min(120, current_angle + 5)
+                if ecart < -5:
+                    current_angle = max(120, current_angle - 5)
+                elif ecart > 5:
+                    current_angle = min(60, current_angle + 5)
 
                 controller.set_angle(0, current_angle)
                 time.sleep(0.05)
