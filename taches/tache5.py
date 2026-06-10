@@ -13,13 +13,22 @@ class Distance:
     def checkdist(self):
         return self.sensor.distance * 1000  # Convert meters to millimeters.
 
+    def cleanup(self):
+        if self.sensor:
+            self.sensor.close()
+
 
 def run():
     distance_sensor = Distance()
-    while True:
-        distance = distance_sensor.checkdist()
-        print("%.2f mm" % distance)
-        sleep(0.05)
+    try:
+        while True:
+            distance = distance_sensor.checkdist()
+            print("%.2f mm" % distance)
+            sleep(0.05)
+    except KeyboardInterrupt:
+        print("Distance sensor stopped")
+    finally:
+        distance_sensor.cleanup()
 
 if __name__ == "__main__":
     run()

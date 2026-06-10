@@ -11,23 +11,34 @@ servo_controller = t3.ServoController()
 servo_sequence = t3.ServoTester(servo_controller)
 servo_manual = t3.ServoManual(servo_controller)
 motor_controller = t4.MotorController()
-distance_sensor = t5.Distance()
-line_follower = t6.LineFollower()
+line_follower = None  # Don't initialize - will be created fresh for each task 6 run
 
 
 if __name__ == "__main__":
     action = input("Entrez les numéros de tâche à exécuter séparés d'un espace : ").strip().split()
     for i in range(len(action)):
-        if action[i] == '1':
-            t1.run()
-        elif action[i] == '2':
-            t2.run()
-        elif action[i] == '3':
-            t3.run()
-        elif action[i] == '4':
-            t4.run()
-        elif action[i] == '5':
-            t5.run()
-        elif action[i] == '6':
-            t6.run()
+        try:
+            if action[i] == '1':
+                t1.run()
+            elif action[i] == '2':
+                t2.run()
+            elif action[i] == '3':
+                t3.run()
+            elif action[i] == '4':
+                t4.run()
+            elif action[i] == '5':
+                t5.run()
+            elif action[i] == '6':
+                t6.run()
+        except KeyboardInterrupt:
+            print("\nTask interrupted by user")
+            break
+        except Exception as e:
+            print(f"Error running task {action[i]}: {e}")
+            # Cleanup GPIO resources if tasks have cleanup methods
+            try:
+                if hasattr(t5, 'distance_sensor') and hasattr(t5.distance_sensor, 'cleanup'):
+                    t5.distance_sensor.cleanup()
+            except:
+                pass
 
