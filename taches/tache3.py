@@ -33,8 +33,8 @@ class ServoController:
         safe_angle = max(min_safe, min(max_safe, angle))
 
         if safe_angle != angle:
-            print(f"  ⚠  CH{servo_id}: {angle}° limite à {safe_angle}° "
-                  f"(plage sûre : {min_safe}°–{max_safe}°)")e
+            print(f"CH{servo_id}: {angle}° limite à {safe_angle}° "
+                  f"(plage sure : {min_safe}°–{max_safe}°)")e
 
         s = servo.Servo(
             self.pca.channels[servo_id],
