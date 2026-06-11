@@ -30,9 +30,6 @@ if __name__ == "__main__":
             m = linecap.middle.value
             l = linecap.left.value
 
-            if not (r == 0 and m == 0 and l == 0):
-                angle_avant_perte = current_angle
-
             if   r == 0 and m == 1 and l == 0:
                 current_angle = ANGLE_CENTER
             elif r == 1 and m == 0 and l == 0:
@@ -47,6 +44,7 @@ if __name__ == "__main__":
                 current_angle = ANGLE_CENTER
 
             elif r == 0 and m == 0 and l == 0:
+                angle_avant_perte = current_angle
                 if ligne_perdue_ts is None:
                     ligne_perdue_ts = time.time()
 
@@ -54,7 +52,6 @@ if __name__ == "__main__":
 
                 # Angle inversé : symétrique par rapport au centre
                 angle_recul = ANGLE_CENTER + (ANGLE_CENTER - angle_avant_perte)
-                angle_recul = max(ANGLE_MIN, min(ANGLE_MAX, angle_recul))
                 current_angle = angle_recul
 
                 if elapsed < 1.5:
@@ -62,8 +59,9 @@ if __name__ == "__main__":
                 else:
                     if robot.en_marche:
                         robot.arreter()
-                        time.sleep(0.1)
-                        robot.mc.drive_ramp(-t9.RobotController.VITESSE_MARCHE, ramp_time=1.7)
+                        time.sleep(2)
+                        controller.set_angle(0, current_angle)  # remet le servo à l'angle avant perte pour "rechercher" la ligne
+                        robot.mc.drive_ramp(-t9.RobotController.VITESSE_MARCHE, ramp_time=2)
                     ligne_perdue_ts = None  # reset pour retenter
                     controller.set_angle(0, angle_avant_perte)  # remet le servo à l'angle avant perte pour "rechercher" la ligne
                     time.sleep(2)
