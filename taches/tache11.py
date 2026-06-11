@@ -57,12 +57,10 @@ if __name__ == "__main__":
 
                 if robot.en_marche:
                     robot.arreter()
-                    time.sleep(0.5)
                     controller.set_angle(0, current_angle)
-                    time.sleep(0.5)
-                    robot.mc.drive_ramp(-t9.RobotController.VITESSE_MARCHE, ramp_time=elapsed+0.07)
+                    robot.mc.drive_ramp(-t9.RobotController.VITESSE_MARCHE, ramp_time=elapsed-0.02)
                 ligne_perdue_ts = None  # reset pour retenter
-                time.sleep(0.5)
+
                 robot.demarrer()
 
             else:
