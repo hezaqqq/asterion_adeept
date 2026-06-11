@@ -33,6 +33,8 @@ if __name__ == "__main__":
                     current_angle = max(80, current_angle - 2)
                 elif (linecap.right.value == 0) and (linecap.middle.value == 1) and (linecap.left.value == 1):
                     current_angle = min(120, current_angle + 2)
+
+                print(f"Line sensors: R={linecap.right.value} M={linecap.middle.value} L={linecap.left.value} | Angle: {current_angle}°")
                     
 
                 controller.set_angle(0, current_angle)
