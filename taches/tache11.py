@@ -58,6 +58,7 @@ if __name__ == "__main__":
                         robot.arreter()
                         current_angle = ANGLE_CENTER
                         robot.mc.drive_ramp(-t9.RobotController.VITESSE_MARCHE, ramp_time=0.3)
+                    robot.demarrer()
                     
                 else:
 
