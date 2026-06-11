@@ -9,7 +9,7 @@ import tache5 as t5
 
 class RobotController:
 
-    VITESSE_MARCHE   = 0.17
+    VITESSE_MARCHE   = 0.2
     DIST_OBSTACLE_MM = 200.0
     PERIODE_CAPTEUR  = 0.05
 
@@ -110,8 +110,6 @@ class RobotController:
 
         except KeyboardInterrupt:
             print("\nFin de programme par Ctrl-C")
-            self.arreter()          # ← stoppe les moteurs
-            self.desactiver_feux()  # ← éteint les LEDs
 
         finally:
             self.controller.set_angle(0, 100)
