@@ -33,27 +33,27 @@ if __name__ == "__main__":
 
             if r == 0 and m == 1 and l == 0:
                 current_angle = ANGLE_CENTER
-                t9.RobotController.VITESSE_MARCHE = 0.3
+                t9.RobotController.VITESSE_MARCHE = 0.4
                 ligne_perdue_ts = None  # ligne retrouvée
 
             elif r == 1 and m == 0 and l == 0:
                 current_angle += 20
-                t9.RobotController.VITESSE_MARCHE = 0.25
+                t9.RobotController.VITESSE_MARCHE = 0.3
                 ligne_perdue_ts = None
 
             elif r == 0 and m == 0 and l == 1:
                 current_angle -= 20
-                t9.RobotController.VITESSE_MARCHE = 0.25
+                t9.RobotController.VITESSE_MARCHE = 0.3
                 ligne_perdue_ts = None
 
             elif r == 1 and m == 1 and l == 0:
                 current_angle += 10
-                t9.RobotController.VITESSE_MARCHE = 0.3
+                t9.RobotController.VITESSE_MARCHE = 0.35
                 ligne_perdue_ts = None
 
             elif r == 0 and m == 1 and l == 1:
                 current_angle -= 10
-                t9.RobotController.VITESSE_MARCHE = 0.3
+                t9.RobotController.VITESSE_MARCHE = 0.35
                 ligne_perdue_ts = None
 
             elif r == 1 and m == 1 and l == 1:
