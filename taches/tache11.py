@@ -32,23 +32,23 @@ if __name__ == "__main__":
 
             if   r == 0 and m == 1 and l == 0:
                 current_angle = ANGLE_CENTER
-                t9.RobotController.VITESSE_MARCHE = 0.25
+                t9.RobotController.VITESSE_MARCHE = 0.3
 
             elif r == 1 and m == 0 and l == 0:
                 current_angle += 20
-                t9.RobotController.VITESSE_MARCHE = 0.2
+                t9.RobotController.VITESSE_MARCHE = 0.25
 
             elif r == 0 and m == 0 and l == 1:
                 current_angle -= 20
-                t9.RobotController.VITESSE_MARCHE = 0.2
+                t9.RobotController.VITESSE_MARCHE = 0.25
 
             elif r == 1 and m == 1 and l == 0:
                 current_angle += 10
-                t9.RobotController.VITESSE_MARCHE = 0.25
+                t9.RobotController.VITESSE_MARCHE = 0.3
 
             elif r == 0 and m == 1 and l == 1:
                 current_angle -= 10
-                t9.RobotController.VITESSE_MARCHE = 0.25
+                t9.RobotController.VITESSE_MARCHE = 0.3
 
             elif r == 1 and m == 1 and l == 1:
                 current_angle = ANGLE_CENTER
