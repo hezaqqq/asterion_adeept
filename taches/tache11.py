@@ -63,7 +63,7 @@ if __name__ == "__main__":
                 current_angle = angle_avant_perte  # pour préparer la reprise
                 controller.set_angle(0, current_angle)
                 robot.demarrer()
-                time.sleep(elapsed+0.5)  # temps de réaction avant de reprendre la ligne
+                time.sleep(elapsed)  # temps de réaction avant de reprendre la ligne
 
             else:
                 ligne_perdue_ts = None
