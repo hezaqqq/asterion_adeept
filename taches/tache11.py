@@ -4,9 +4,10 @@ import tache3 as t3
 import threading
 import time
 
-ANGLE_CENTER = 100
-ANGLE_MIN    = 60
-ANGLE_MAX    = 140
+ANGLE_CENTER  = 100
+ANGLE_MIN     = 60
+ANGLE_MAX     = 140
+TROU = 0.5   # durée d'un trou blanc à ignorer
 
 if __name__ == "__main__":
     try:
@@ -17,77 +18,81 @@ if __name__ == "__main__":
         linecap    = t6.LineFollower()
         controller = t3.ServoController()
 
-        current_angle      = ANGLE_CENTER
+        current_angle     = ANGLE_CENTER
         controller.set_angle(0, current_angle)
-        was_en_marche      = robot.en_marche
-        ligne_perdue_ts    = None
-        angle_avant_perte  = ANGLE_CENTER
-
-        previous_r = previous_m = previous_l = 1  # Assume all sensors start on the line
+        was_en_marche     = robot.en_marche
+        ligne_perdue_ts   = None   # timestamp du début de perte de ligne
+        angle_avant_perte = ANGLE_CENTER
 
         robot.demarrer()
-        
+
         while True:
             r = linecap.right.value
             m = linecap.middle.value
             l = linecap.left.value
 
-            if   r == 0 and m == 1 and l == 0:
+            if r == 0 and m == 1 and l == 0:
                 current_angle = ANGLE_CENTER
                 t9.RobotController.VITESSE_MARCHE = 0.3
+                ligne_perdue_ts = None  # ligne retrouvée
 
             elif r == 1 and m == 0 and l == 0:
                 current_angle += 20
                 t9.RobotController.VITESSE_MARCHE = 0.25
+                ligne_perdue_ts = None
 
             elif r == 0 and m == 0 and l == 1:
                 current_angle -= 20
                 t9.RobotController.VITESSE_MARCHE = 0.25
+                ligne_perdue_ts = None
 
             elif r == 1 and m == 1 and l == 0:
                 current_angle += 10
                 t9.RobotController.VITESSE_MARCHE = 0.3
+                ligne_perdue_ts = None
 
             elif r == 0 and m == 1 and l == 1:
                 current_angle -= 10
                 t9.RobotController.VITESSE_MARCHE = 0.3
+                ligne_perdue_ts = None
 
             elif r == 1 and m == 1 and l == 1:
                 current_angle = ANGLE_CENTER
-
+                ligne_perdue_ts = None
 
             elif r == 0 and m == 0 and l == 0:
-                if (previous_r == 0 and previous_m == 1 and previous_l == 0) or (previous_r == 1 and previous_m == 1 and previous_l == 1):
-                    robot.mc.drive_ramp(t9.RobotController.VITESSE_MARCHE, ramp_time=1.5)
-                    time.sleep(1.5)
-                else:    
-                    angle_avant_perte = current_angle
-                    if ligne_perdue_ts is None:
-                        ligne_perdue_ts = time.time()
+                # Premier passage à 0/0/0
+                if ligne_perdue_ts is None:
+                    ligne_perdue_ts   = time.time()
+                    angle_avant_perte = current_angle 
 
-                    elapsed = time.time() - ligne_perdue_ts
+                elapsed = time.time() - ligne_perdue_ts
 
-                    # Angle inversé : symétrique par rapport au centre
+                if elapsed <= TROU:
+                    # Trou blanc
+                    pass
+
+                else:
+                    # Ligne vraiment perdue
                     angle_recul = ANGLE_CENTER + (ANGLE_CENTER - angle_avant_perte)
-                    current_angle = angle_recul
-
+                    current_angle = max(ANGLE_MIN, min(ANGLE_MAX, angle_recul))
 
                     if robot.en_marche:
                         robot.arreter()
                         controller.set_angle(0, current_angle)
-                        robot.mc.drive_ramp(-t9.RobotController.VITESSE_MARCHE, ramp_time=elapsed+0.5)
-                    ligne_perdue_ts = None  # reset pour retenter
+                        robot.mc.drive_ramp(
+                            -t9.RobotController.VITESSE_MARCHE,
+                            ramp_time=elapsed + 0.5
+                        )
 
-                    current_angle = angle_avant_perte  # pour préparer la reprise
+                    ligne_perdue_ts = None# reset pour retenter
+                    current_angle   = angle_avant_perte   # reprend l'angle d'avant
                     controller.set_angle(0, current_angle)
                     robot.demarrer()
-            
 
             else:
                 ligne_perdue_ts = None
 
-            previous_r = previous_m = previous_l = r, m, l
-            
             # Sécurité bornes servo
             current_angle = max(ANGLE_MIN, min(ANGLE_MAX, current_angle))
             controller.set_angle(0, current_angle)
