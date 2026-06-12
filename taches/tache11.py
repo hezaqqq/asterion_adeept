@@ -45,7 +45,6 @@ if __name__ == "__main__":
             elif r == 0 and m == 0 and l == 0:
                 angle_avant_perte = current_angle
                 if ligne_perdue_ts is None:
-                    nb_recule += 1
                     ligne_perdue_ts = time.time()
 
                 elapsed = time.time() - ligne_perdue_ts
