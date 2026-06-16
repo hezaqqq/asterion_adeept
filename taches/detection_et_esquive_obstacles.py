@@ -9,8 +9,8 @@ ANGLE_MIN_ROUE     = 60
 ANGLE_MAX_ROUE     = 140
 
 ANGLE_CENTER_TETE_GD  = 108
-ANGLE_MIN_TETE_GD     = 68
-ANGLE_MAX_TETE_GD     = 148
+ANGLE_MIN_TETE_GD     = 78
+ANGLE_MAX_TETE_GD     = 138
 
 if __name__ == "__main__":
     try:
@@ -22,9 +22,9 @@ if __name__ == "__main__":
 
         while True:
             if angle_tete_gd < ANGLE_MAX_TETE_GD and gauche:
-                angle_tete_gd += 1
+                angle_tete_gd += 5
             elif angle_tete_gd > ANGLE_MIN_TETE_GD and not gauche:
-                angle_tete_gd -= 1
+                angle_tete_gd -= 5
             elif angle_tete_gd >= ANGLE_MAX_TETE_GD:
                 gauche = False
             elif angle_tete_gd <= ANGLE_MIN_TETE_GD:
@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
             tete.set_angle(1, angle_tete_gd)
 
-            time.sleep(0.05)
+            time.sleep(0.1)
     
     except KeyboardInterrupt:
         pass  
