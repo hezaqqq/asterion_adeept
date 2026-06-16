@@ -14,13 +14,17 @@ ANGLE_MAX_TETE_GD     = 138
 
 if __name__ == "__main__":
     try:
-        tete = t3.ServoController()
+        controller = t3.ServoController()
         angle_tete_gd = ANGLE_CENTER_TETE_GD
-        tete.set_angle(1, angle_tete_gd)
-        tete.set_angle(2, 85)
+        controller.set_angle(1, angle_tete_gd)
+        controller.set_angle(2, 85)
         gauche = True
 
         sensor = t5.Distance()
+
+        robot = t9.RobotController()
+        controller.set_angle(0, ANGLE_CENTER_ROUE)
+        robot.demarrer()        
 
         while True:
             if angle_tete_gd < ANGLE_MAX_TETE_GD and gauche:
@@ -31,15 +35,19 @@ if __name__ == "__main__":
                 gauche = False
             elif angle_tete_gd <= ANGLE_MIN_TETE_GD:
                 gauche = True
-            tete.set_angle(1, angle_tete_gd)
+            controller.set_angle(1, angle_tete_gd)
 
             distance = sensor.checkdist()
             if distance < 200:
                 print("Obstacle detected! Stopping the robot.")
-
+                robot.arreter()
+            else:
+                if not robot.en_marche:
+                    robot.demarrer()
+            
             time.sleep(0.05)
     
     except KeyboardInterrupt:
         angle_tete_gd = ANGLE_CENTER_TETE_GD
-        tete.set_angle(1, angle_tete_gd)
+        controller.set_angle(1, angle_tete_gd)
         pass  
