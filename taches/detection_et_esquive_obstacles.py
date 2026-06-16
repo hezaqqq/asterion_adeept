@@ -30,6 +30,8 @@ if __name__ == "__main__":
             elif angle_tete_gd <= ANGLE_MIN_TETE_GD:
                 gauche = True
 
+            tete.set_angle(1, angle_tete_gd)
+
             time.sleep(0.05)
     
     except KeyboardInterrupt:
