@@ -14,11 +14,13 @@ ANGLE_MAX_TETE_GD     = 138
 
 if __name__ == "__main__":
     try:
-        angle_tete_gd = ANGLE_CENTER_TETE_GD
         tete = t3.ServoController()
-        tete.set_angle(2, 85)
+        angle_tete_gd = ANGLE_CENTER_TETE_GD
         tete.set_angle(1, angle_tete_gd)
+        tete.set_angle(2, 85)
         gauche = True
+
+        sensor = t5.Distance()
 
         while True:
             if angle_tete_gd < ANGLE_MAX_TETE_GD and gauche:
@@ -31,6 +33,9 @@ if __name__ == "__main__":
                 gauche = True
 
             tete.set_angle(1, angle_tete_gd)
+
+            distance = sensor.checkdist()
+            print("Distance: %.2f mm" % distance)
 
             time.sleep(0.002)
     
