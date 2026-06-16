@@ -23,7 +23,6 @@ def run():
     try:
         while True:
             distance = distance_sensor.checkdist()
-            print("%.2f mm" % distance)
             sleep(0.05)
     except KeyboardInterrupt:
         print("Distance sensor stopped")
