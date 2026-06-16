@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
             tete.set_angle(1, angle_tete_gd)
 
-            time.sleep(0.01)
+            time.sleep(0.05)
     
     except KeyboardInterrupt:
         pass  
