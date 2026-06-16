@@ -40,4 +40,6 @@ if __name__ == "__main__":
             time.sleep(0.05)
     
     except KeyboardInterrupt:
+        angle_tete_gd = ANGLE_CENTER_TETE_GD
+        tete.set_angle(1, angle_tete_gd)
         pass  
