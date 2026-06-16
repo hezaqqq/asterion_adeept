@@ -13,7 +13,7 @@ class RobotController:
     DIST_OBSTACLE_MM = 200.0
     PERIODE_CAPTEUR  = 0.05
 
-    def __init__(self):
+    def __init__(self, capteur=None):
         self.leds_gpio = t1.RobotLEDController()
         self.leds_gpio.switchSetup()
         self.leds_gpio.set_all_switch_off()
@@ -21,8 +21,8 @@ class RobotController:
         self.leds_ws = t2.LEDController(led_count=14)
         self.leds_ws.turn_off_all()
 
-        self.mc      = t4.MotorController()
-        self.capteur = t5.Distance()
+        self.mc = t4.MotorController()
+        self.capteur = capteur if capteur is not None else t5.Distance()
 
         self.en_marche   = False
         self.feux_actifs = False

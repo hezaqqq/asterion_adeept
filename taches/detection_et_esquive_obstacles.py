@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
         sensor = t5.Distance()
 
-        robot = t9.RobotController()
+        robot = t9.RobotController(capteur=sensor)
         controller.set_angle(0, ANGLE_CENTER_ROUE)
         robot.demarrer()        
 
