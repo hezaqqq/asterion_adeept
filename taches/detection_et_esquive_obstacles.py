@@ -37,7 +37,7 @@ if __name__ == "__main__":
             distance = sensor.checkdist()
             print("Distance: %.2f mm" % distance)
 
-            time.sleep(0.1)
+            time.sleep(0.05)
     
     except KeyboardInterrupt:
         pass  
