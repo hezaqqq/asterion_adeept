@@ -31,11 +31,11 @@ if __name__ == "__main__":
                 gauche = False
             elif angle_tete_gd <= ANGLE_MIN_TETE_GD:
                 gauche = True
-
             tete.set_angle(1, angle_tete_gd)
 
             distance = sensor.checkdist()
-            print("Distance: %.2f mm" % distance)
+            if distance < 200:
+                print("Obstacle detected! Stopping the robot.")
 
             time.sleep(0.05)
     
