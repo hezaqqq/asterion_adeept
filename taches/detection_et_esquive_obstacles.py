@@ -22,9 +22,9 @@ if __name__ == "__main__":
 
         while True:
             if angle_tete_gd < ANGLE_MAX_TETE_GD and gauche:
-                angle_tete_gd += 1
+                angle_tete_gd += 0.5
             elif angle_tete_gd > ANGLE_MIN_TETE_GD and not gauche:
-                angle_tete_gd -= 1
+                angle_tete_gd -= 0.5
             elif angle_tete_gd >= ANGLE_MAX_TETE_GD:
                 gauche = False
             elif angle_tete_gd <= ANGLE_MIN_TETE_GD:
