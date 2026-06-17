@@ -123,3 +123,4 @@ if __name__ == "__main__":
     setup_hardware()
     set_lights(False)
     play_bomb_sequence()
+
