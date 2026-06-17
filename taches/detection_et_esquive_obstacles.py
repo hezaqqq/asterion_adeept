@@ -50,4 +50,3 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         angle_tete_gd = ANGLE_CENTER_TETE_GD
         controller.set_angle(1, angle_tete_gd)
-        pass  

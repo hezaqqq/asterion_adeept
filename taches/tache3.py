@@ -19,7 +19,7 @@ class ServoController:
         7: (0,  185),   # CH7 – servo libre, pleine plage autorisee
     }
 
-    MIN_PULSE = 500   
+    MIN_PULSE = 600   
     MAX_PULSE = 2400  
 
     def __init__(self):
