@@ -42,26 +42,16 @@ if __name__ == "__main__":
             distance = sensor.checkdist()
 
             if distance < 200 and distance > 0:
-                if not avoiding:
-                    if angle_tete_gd < ANGLE_CENTER_TETE_GD:
-                        turn_direction = 1
-                        controller.set_angle(0, ANGLE_MAX_ROUE) 
-                    else:
-                        # Obstacle à droite donc on tourne à gauche
-                        turn_direction = -1
-                        controller.set_angle(0, ANGLE_MIN_ROUE)
-                    
-                    avoiding = True
-                    robot.demarrer()
-
-            else:
-                # Pas d'obstacles
-                if avoiding:
-                    avoiding = False
-                    controller.set_angle(0, ANGLE_CENTER_ROUE)  
+                if angle_tete_gd < ANGLE_CENTER_TETE_GD:
+                    turn_direction = 1
+                    controller.set_angle(0, ANGLE_MAX_ROUE) 
                 else:
-                    controller.set_angle(0, ANGLE_CENTER_ROUE)
-                    robot.demarrer()
+                    # Obstacle à droite donc on tourne à gauche
+                    turn_direction = -1
+                    controller.set_angle(0, ANGLE_MIN_ROUE)
+                
+                robot.demarrer()
+
 
             time.sleep(0.05)
 
