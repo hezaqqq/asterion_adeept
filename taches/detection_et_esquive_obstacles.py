@@ -25,7 +25,6 @@ if __name__ == "__main__":
         gauche       = True
         angle_tete_gd = ANGLE_CENTER_TETE_GD
 
-        # Un seul thread de surveillance
         threading.Thread(target=robot._surveiller_distance, daemon=True).start()
         robot.demarrer()
 
