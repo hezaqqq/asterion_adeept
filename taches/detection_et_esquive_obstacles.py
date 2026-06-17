@@ -37,15 +37,15 @@ if __name__ == "__main__":
                 gauche = True
             controller.set_angle(1, angle_tete_gd)
 
-            distance = sensor.checkdist()
-            if distance < 200:
-                print("Obstacle detected! Stopping the robot.")
-                robot.arreter()
-            else:
-                if not robot.en_marche:
-                    robot.demarrer()
-            
             time.sleep(0.05)
+
+#            distance = sensor.checkdist()
+#            if distance < 200:
+#                print("Obstacle detected! Stopping the robot.")
+#                robot.arreter()
+#            else:
+#                if not robot.en_marche:
+#                    robot.demarrer()
     
     except KeyboardInterrupt:
         robot.mc._set_all_motors(0)
