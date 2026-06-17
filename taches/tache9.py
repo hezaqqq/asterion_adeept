@@ -82,7 +82,6 @@ class RobotController:
                     dist = self.capteur.checkdist()
                     if dist < self.DIST_OBSTACLE_MM:
                         self.arreter()
-                        self.activer_feux()
             except Exception:
                 break
             time.sleep(self.PERIODE_CAPTEUR)
