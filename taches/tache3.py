@@ -27,19 +27,21 @@ class ServoController:
         i2c = busio.I2C(SCL, SDA)
         self.pca = PCA9685(i2c, address=0x5f)
         self.pca.frequency = 50
+        self.servos = {
+            ch: servo.Servo(
+                self.pca.channels[ch],
+                min_pulse=self.MIN_PULSE,
+                max_pulse=self.MAX_PULSE,
+                actuation_range=180
+            )
+            for ch in self.SAFE_ANGLES
+        }
         print("PCA9685 initialis (I2C 0x5f, 50 Hz)")
 
     def set_angle(self, servo_id: int, angle: float) -> None:
         min_safe, max_safe = self.SAFE_ANGLES.get(servo_id, (0, 180))
         safe_angle = max(min_safe, min(max_safe, angle))
-        
-        s = servo.Servo(
-            self.pca.channels[servo_id],
-            min_pulse=self.MIN_PULSE,
-            max_pulse=self.MAX_PULSE,
-            actuation_range=180
-        )
-        s.angle = safe_angle
+        self.servos[servo_id].angle = safe_angle
 
     def center_all(self) -> None:
         """Remet tous les servos configures à 90° (position centrale)."""
