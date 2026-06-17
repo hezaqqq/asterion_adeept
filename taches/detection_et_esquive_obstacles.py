@@ -17,7 +17,7 @@ if __name__ == "__main__":
         controller = t3.ServoController()
         angle_tete_gd = ANGLE_CENTER_TETE_GD
         controller.set_angle(1, angle_tete_gd)
-        controller.set_angle(2, 85)
+        controller.set_angle(2, 75)
         gauche = True
 
         sensor = t5.Distance()
