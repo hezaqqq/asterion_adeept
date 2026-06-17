@@ -82,7 +82,6 @@ class RobotController:
                 if dist < self.DIST_OBSTACLE_MM:
                     print(f"[CAPTEUR] Obstacle a {dist:.0f} mm — arret !")
                     self.arreter()
-                    self.activer_feux()
             time.sleep(self.PERIODE_CAPTEUR)
 
     # ── Run ───────────────────────────────────────────────────
