@@ -3,6 +3,8 @@ import tache5 as t5
 import tache3 as t3
 import time
 
+import threading
+
 ANGLE_CENTER_ROUE = 100
 ANGLE_MIN_ROUE = 60
 ANGLE_MAX_ROUE = 140
@@ -19,8 +21,7 @@ if __name__ == "__main__":
         controller.set_angle(2, 85)
         gauche = True
 
-        sensor = t5.Distance()
-        robot = t9.RobotController(capteur=sensor)
+        robot = t9.RobotController()
         controller.set_angle(0, ANGLE_CENTER_ROUE)
         robot.demarrer()     
 
@@ -35,29 +36,9 @@ if __name__ == "__main__":
                 gauche = True
             controller.set_angle(1, angle_tete_gd)
 
-            distance = sensor.checkdist()
-
-            if distance < 200 and distance > 0:
-                if angle_tete_gd < ANGLE_CENTER_TETE_GD:
-                    turn_direction = 1
-                    controller.set_angle(0, ANGLE_MAX_ROUE) 
-                else:
-                    # Obstacle à droite donc on tourne à gauche
-                    turn_direction = -1
-                    controller.set_angle(0, ANGLE_MIN_ROUE)
-                
-                robot.demarrer()
-
-
             time.sleep(0.05)
 
-            distance = sensor.checkdist()
-            if distance < 200:
-                print("Obstacle detected! Stopping the robot.")
-                robot.arreter()
-            else:
-                if not robot.en_marche:
-                    robot.demarrer()
+            threading.Thread(target=robot._surveiller_distance, daemon=True).start()
     
     except KeyboardInterrupt:
         robot.mc._set_all_motors(0)
