@@ -14,9 +14,9 @@ ANGLE_MAX_TETE_GD    = 138
 if __name__ == "__main__":
     robot = None
     try:
-        controller = t3.ServoController()
         sensor     = t5.Distance()
         robot      = t9.RobotController(capteur=sensor)
+        controller = t3.ServoController()
 
         controller.set_angle(1, ANGLE_CENTER_TETE_GD)
         controller.set_angle(2, 85)

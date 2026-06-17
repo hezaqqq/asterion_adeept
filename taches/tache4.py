@@ -16,7 +16,7 @@ class MotorController:
     def __init__(self):
         self.i2c = busio.I2C(SCL, SDA)
         self.pwm_motor = PCA9685(self.i2c, address=0x5f)
-        self.pwm_motor.frequency = 1000  # 1 kHz pour moteurs DC
+        self.pwm_motor.frequency = 50  # 50 Hz pour moteurs DC
 
         MOTOR_M1_IN1, MOTOR_M1_IN2 = 15, 14
         MOTOR_M2_IN1, MOTOR_M2_IN2 = 12, 13
