@@ -48,11 +48,7 @@ if __name__ == "__main__":
             time.sleep(0.05)
     
     except KeyboardInterrupt:
-        # 1. Stop immédiat des moteurs (bypass la rampe)
         robot.mc._set_all_motors(0)
-        # 2. Feux off
         robot.desactiver_feux()
-        # 3. Tête au centre
         controller.set_angle(1, ANGLE_CENTER_TETE_GD)
-        # 4. Un seul deinit suffit (même PCA9685)
         robot.mc.pwm_motor.deinit()
