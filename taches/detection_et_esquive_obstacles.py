@@ -1,16 +1,15 @@
 import tache9 as t9
 import tache5 as t5
 import tache3 as t3
-import threading
 import time
 
-ANGLE_CENTER_ROUE  = 100
-ANGLE_MIN_ROUE     = 60
-ANGLE_MAX_ROUE     = 140
+ANGLE_CENTER_ROUE = 100
+ANGLE_MIN_ROUE = 60
+ANGLE_MAX_ROUE = 140
 
-ANGLE_CENTER_TETE_GD  = 108
-ANGLE_MIN_TETE_GD     = 78
-ANGLE_MAX_TETE_GD     = 138
+ANGLE_CENTER_TETE_GD = 108
+ANGLE_MIN_TETE_GD = 78
+ANGLE_MAX_TETE_GD = 138
 
 if __name__ == "__main__":
     try:
@@ -21,10 +20,12 @@ if __name__ == "__main__":
         gauche = True
 
         sensor = t5.Distance()
-
         robot = t9.RobotController(capteur=sensor)
         controller.set_angle(0, ANGLE_CENTER_ROUE)
-        robot.demarrer()        
+        robot.demarrer()
+
+        avoiding = False
+        turn_direction = 0  # -1 = gauche et 1 = droite
 
         while True:
             if angle_tete_gd < ANGLE_MAX_TETE_GD and gauche:
@@ -38,15 +39,32 @@ if __name__ == "__main__":
             controller.set_angle(1, angle_tete_gd)
 
             distance = sensor.checkdist()
-            if distance < 200:
-                print("Obstacle detected! Stopping the robot.")
-                robot.arreter()
-            else:
-                if not robot.en_marche:
+
+            if distance < 200 and distance > 0:
+                if not avoiding:
+                    if angle_tete_gd < ANGLE_CENTER_TETE_GD:
+                        turn_direction = 1
+                        controller.set_angle(0, ANGLE_MAX_ROUE) 
+                    else:
+                        # Obstacle à droite donc on tourne à gauche
+                        turn_direction = -1
+                        controller.set_angle(0, ANGLE_MIN_ROUE)
+                    
+                    avoiding = True
                     robot.demarrer()
-            
+
+            else:
+                # Pas d'obstacles
+                if avoiding:
+                    avoiding = False
+                    controller.set_angle(0, ANGLE_CENTER_ROUE)  
+                else:
+                    controller.set_angle(0, ANGLE_CENTER_ROUE)
+                    robot.demarrer()
+
             time.sleep(0.05)
-    
+
     except KeyboardInterrupt:
-        angle_tete_gd = ANGLE_CENTER_TETE_GD
-        controller.set_angle(1, angle_tete_gd)
+        controller.set_angle(1, ANGLE_CENTER_TETE_GD)
+        controller.set_angle(0, ANGLE_CENTER_ROUE)
+        robot.arreter()
