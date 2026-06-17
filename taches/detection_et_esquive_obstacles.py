@@ -24,9 +24,9 @@ if __name__ == "__main__":
         controller.set_angle(0, ANGLE_CENTER_ROUE)
         robot.demarrer()
 
-        #robot = t9.RobotController(capteur=sensor)
-        #controller.set_angle(0, ANGLE_CENTER_ROUE)
-        #robot.demarrer()        
+        robot = t9.RobotController(capteur=sensor)
+        controller.set_angle(0, ANGLE_CENTER_ROUE)
+        robot.demarrer()        
 
         while True:
             if angle_tete_gd < ANGLE_MAX_TETE_GD and gauche:
@@ -65,16 +65,16 @@ if __name__ == "__main__":
 
             time.sleep(0.05)
 
-#            distance = sensor.checkdist()
-#            if distance < 200:
-#                print("Obstacle detected! Stopping the robot.")
-#                robot.arreter()
-#            else:
-#                if not robot.en_marche:
-#                    robot.demarrer()
+            distance = sensor.checkdist()
+            if distance < 200:
+                print("Obstacle detected! Stopping the robot.")
+                robot.arreter()
+            else:
+                if not robot.en_marche:
+                    robot.demarrer()
     
     except KeyboardInterrupt:
-        #robot.mc._set_all_motors(0)
-        #robot.desactiver_feux()
+        robot.mc._set_all_motors(0)
+        robot.desactiver_feux()
         controller.set_angle(1, ANGLE_CENTER_TETE_GD)
-        #robot.mc.pwm_motor.deinit()
+        robot.mc.pwm_motor.deinit()
