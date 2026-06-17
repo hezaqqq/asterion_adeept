@@ -20,9 +20,9 @@ if __name__ == "__main__":
         gauche = True
 
         sensor = t5.Distance()
-        #robot = t9.RobotController(capteur=sensor)
+        robot = t9.RobotController(capteur=sensor)
         controller.set_angle(0, ANGLE_CENTER_ROUE)
-        #robot.demarrer()     
+        robot.demarrer()     
 
         while True:
             if angle_tete_gd < ANGLE_MAX_TETE_GD and gauche:
