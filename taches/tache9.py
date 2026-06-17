@@ -77,11 +77,14 @@ class RobotController:
 
     def _surveiller_distance(self):
         while True:
-            if self.en_marche:
-                dist = self.capteur.checkdist()
-                if dist < self.DIST_OBSTACLE_MM:
-                    print(f"[CAPTEUR] Obstacle a {dist:.0f} mm — arret !")
-                    self.arreter()
+            try:
+                if self.en_marche:
+                    dist = self.capteur.checkdist()
+                    if dist < self.DIST_OBSTACLE_MM:
+                        self.arreter()
+                        self.activer_feux()
+            except Exception:
+                break
             time.sleep(self.PERIODE_CAPTEUR)
 
     # ── Run ───────────────────────────────────────────────────
